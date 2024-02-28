@@ -14,11 +14,6 @@ public class Main {
         manager.addTask(task_2);
         manager.addTask(task_3);
 
-        //manager.updateTask("Путешествие","Арендовать транспорт", 1, 100); +
-        //manager.removeAllTasks(); +
-        //manager.getTaskById(1); +
-        //manager.removeTaskById(2); +
-
         manager.addSubtaskToTask(task_1.getId(), subtask_1);
         manager.getAllTasks();
         manager.getAllTasksWithSubtasks();
@@ -31,17 +26,5 @@ public class Main {
 
         epic_1.getAllTasks();
         epic_1.getAllTasksWithSubtasks();
-
-
-
-        //Возможность хранить задачи всех типов -
-        //Получение списка всех задач + getAllTasks() (Задача + /Эпик/Подзадача)
-        //Удаление всех задач + removeAllTasks()
-        //Получение по идентификатору + getTaskById()
-        //Создание. Сам объект должен передаваться в качестве параметра + addTask()
-        //Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра + updateTask()
-        //Удаление по идентификатору + removeTaskById()
-        //Менеджер сам не выбирает статус для задачи +
-
     }
 }
