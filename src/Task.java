@@ -1,33 +1,59 @@
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class Task {
     private String title;
     private String description;
-    private int taskId;
     private TaskStatus status;
-    private ArrayList<Subtask> subtasks;
+    private HashMap<String, Subtask> subtasks;
 
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
-        this.subtasks = new ArrayList<>();
+        this.status = TaskStatus.NEW;
+        this.subtasks = new HashMap<>();
     }
 
-    public String getTitle() { return title; }
-    public void setTitle(String newTitle) { this.title = newTitle; }
-    public String getDescription() { return description; }
-    public void setDescription(String newDescription) { this.description = newDescription; }
-    public int getId() { return this.taskId; }
-    public void setId(int newId) { this.taskId = newId; }
-    public TaskStatus getTaskStatus() { return this.status; }
-    public void setTaskStatus(TaskStatus newStatus) { this.status = newStatus; }
-    public void addSubtask(Subtask subtask) { subtasks.add(subtask); }
-    public ArrayList<Subtask> getSubtasks() {return subtasks;}
+    public void addSubtask(String subtaskId, Subtask subtask) {
+        subtasks.put(subtaskId, subtask);
+    }
+    public HashMap<String, Subtask> getSubtasks() {
+        return subtasks;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public TaskStatus getStatus() {
+        return this.status;
+    }
 
     @Override
     public String toString() {
-        return "{" + "title='" + title + ", description='" + description + ", taskId=" + taskId + ", status=" + status + '}';
+        return "{" + "title='" + title + ", description='" + description + ", status=" + status + '}';
     }
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, description, status);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(title, task.title) &&
+                Objects.equals(description, task.description) &&
+                status == task.status;
+    }
+
+
+
 }
 
 enum TaskStatus {
