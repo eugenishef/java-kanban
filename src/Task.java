@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.Objects;
 
 public class Task {
     private String title;
@@ -37,23 +36,6 @@ public class Task {
     public String toString() {
         return "{" + "title='" + title + ", description='" + description + ", status=" + status + '}';
     }
-    @Override
-    public int hashCode() {
-        return Objects.hash(title, description, status);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return Objects.equals(title, task.title) &&
-                Objects.equals(description, task.description) &&
-                status == task.status;
-    }
-
-
-
 }
 
 enum TaskStatus {

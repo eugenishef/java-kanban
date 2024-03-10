@@ -1,5 +1,3 @@
-import java.util.HashMap;
-
 public class Epic {
     private String title;
     private Task mainTask;
@@ -7,10 +5,6 @@ public class Epic {
     public Epic(String title, Task mainTask) {
         this.title = title;
         this.mainTask = mainTask;
-    }
-
-    public Task getMainTask() {
-        return mainTask;
     }
 
     public TaskStatus getStatus() {
