@@ -1,8 +1,8 @@
 public class Managers {
     public static TaskManager getDefault() {
-        return new InMemoryTaskManager(); // Пока используем только InMemoryTaskManager
+        return new InMemoryTaskManager();
     }
     public static HistoryManager getDefaultHistory() {
-        return new InMemoryHistoryManager(); // История просмотров
+        return new InMemoryHistoryManager();
     }
 }
