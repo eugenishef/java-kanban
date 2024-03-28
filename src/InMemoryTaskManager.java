@@ -24,7 +24,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) {
-        String taskId = uuidGenerator.generateUuid();
+        String taskId = task.getId();
         tasks.put(taskId, task);
         taskIndex.put(task, taskId);
     }
@@ -68,9 +68,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeById(String taskId) {
         Task removedTask = tasks.remove(taskId);
         if (removedTask != null) {
-            System.out.println("Task with id: " + taskId + " successfully removed.");
+            System.out.println("Задача с id: " + taskId + " удалена");
         } else {
-            System.out.println("Task with id: " + taskId + " not found.");
+            System.out.println("Задача с id: " + taskId + " не найдена");
         }
     }
 
@@ -79,18 +79,18 @@ public class InMemoryTaskManager implements TaskManager {
         switch (taskType.toLowerCase()) {
             case "tasks":
                 tasks.clear();
-                System.out.println("Tasks cleared!");
+                System.out.println("Задачи очищены!");
                 break;
             case "subtasks":
                 subtasks.clear();
-                System.out.println("Subtasks cleared!");
+                System.out.println("Подзадачи очищены!");
                 break;
             case "epics":
                 epics.clear();
-                System.out.println("Epics cleared!");
+                System.out.println("Эпики очищены!");
                 break;
             default:
-                System.out.println("Error occurred while clearing. Check the task type (tasks/subtasks/epic).");
+                System.out.println("Произошла ошибка, используйте слова (tasks/subtasks/epic).");
         }
     }
 
@@ -104,6 +104,32 @@ public class InMemoryTaskManager implements TaskManager {
     public void addSubtaskToTask(Task task, Subtask subtask) {
         String subtaskId = UUID.randomUUID().toString();
         task.addSubtask(subtaskId, subtask);
+    }
+
+    @Override
+    public void removeSubtaskFromTask(Task task, Subtask subtask) {
+        if (task == null || subtask == null) {
+            System.out.println("Ошибка: задача или подзадача не существует.");
+            return;
+        }
+
+        String subtaskId = getSubtaskIdFromTask(task, subtask);
+        if (subtaskId == null) {
+            System.out.println("Ошибка: подзадача не найдена в задаче.");
+            return;
+        }
+
+        task.getSubtasks().remove(subtaskId);
+        System.out.println("Подзадача успешно удалена из задачи.");
+    }
+
+    private String getSubtaskIdFromTask(Task task, Subtask subtask) {
+        for (Map.Entry<String, Subtask> entry : task.getSubtasks().entrySet()) {
+            if (entry.getValue().equals(subtask)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -136,7 +162,7 @@ public class InMemoryTaskManager implements TaskManager {
             String taskId = entry.getKey();
             Task taskValue = entry.getValue();
             if (!taskValue.getSubtasks().isEmpty()) {
-                System.out.println("Task with subtask:");
+                System.out.println("Задача с подзадачей:");
                 System.out.println(String.format("TaskId: %s, TaskDesc: %s", taskId, taskValue));
                 for (Map.Entry<String, Subtask> subtaskEntry : taskValue.getSubtasks().entrySet()) {
                     String subtaskId = subtaskEntry.getKey();
