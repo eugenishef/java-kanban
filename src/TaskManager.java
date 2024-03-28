@@ -6,7 +6,6 @@ public interface TaskManager {
     List<Task> getHistory();
     Task findTaskById(String taskId);
     Subtask findSubtaskById(String subtaskId);
-    //Epic findEpicById(String epicId);
     void removeById(String taskId);
     void removeAll(String taskType);
     void createSubtask(Subtask subtask);
