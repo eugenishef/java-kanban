@@ -21,7 +21,9 @@ public interface TaskManager {
     String getSubtaskIdFromTask(Task foundRecords);
     void removeSubtaskById(String subtaskId);
     void addEpic(Epic epic, Task... tasks);
+    String getId(Epic epic);
     String getTitle(Epic epic);
+    String getStatusFromTasks(Epic epic);
     void removeEpicById(String id);
     void printTasks();
     void printSubtasks();
@@ -32,4 +34,5 @@ public interface TaskManager {
     void printHistory();
     void printFoundSubtask(Subtask subtask);
     void removeAll(String taskType);
+    default void save() {}
 }

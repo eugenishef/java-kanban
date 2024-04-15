@@ -165,8 +165,25 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public String getId(Epic epic) {
+        return epic.getId();
+    }
+
+    @Override
     public String getTitle(Epic epic) {
         return epic.getTitle();
+    }
+
+    @Override
+    public String getStatusFromTasks(Epic epic) {
+        for (Task task : epic) {
+            if (task.getStatus() == Task.TaskStatus.IN_PROGRESS) {
+                return Task.TaskStatus.IN_PROGRESS.toString();
+            } else if (task.getStatus() == Task.TaskStatus.DONE) {
+                return Task.TaskStatus.DONE.toString();
+            }
+        }
+        return Task.TaskStatus.NEW.toString();
     }
 
     @Override

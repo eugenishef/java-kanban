@@ -12,6 +12,6 @@ public class EpicTest {
     subtask.createSubtask();
     task.addSubtask(subtask.getId(), subtask);
 
-    assertNotNull(epic.localEpics);
+    assertNotNull(epic.epics);
   }
 }
