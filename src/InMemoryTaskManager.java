@@ -1,76 +1,242 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private UUIDGenerator uuidGenerator;
-    private Map<String, Task> tasks;
-    private Map<String, Subtask> subtasks;
-    private Map<String, Epic> epics;
-    private Map<Task, String> taskIndex;
+    protected HashMap<String, Task> tasks;
+    protected HashMap<String, Subtask> subtasks;
+    protected HashMap<String, Epic> epics;
     private LinkedList<Task> history;
+
+    UUIDGenerator uuidGenerator;
 
     public InMemoryTaskManager() {
         uuidGenerator = new UUIDGenerator();
         tasks = new HashMap<>();
         subtasks = new HashMap<>();
         epics = new HashMap<>();
-        taskIndex = new HashMap<>();
         history = new LinkedList<>();
+    }
+
+    public HashMap<String, Task> getTasks() {
+        return tasks;
+    }
+
+    public HashMap<String, Subtask> getSubtasks() {
+        return subtasks;
     }
 
     @Override
     public void addTask(Task task) {
-        String taskId = uuidGenerator.generateUuid();
-        tasks.put(taskId, task);
-        taskIndex.put(task, taskId);
+        String taskId = task.getId();
+        tasks.put(taskId, tasks.getOrDefault(taskId, task));
     }
 
     @Override
-    public String getTaskId(Task task) {
-        return taskIndex.get(task);
+    public String getId(Task task) {
+        return task.getId();
     }
+
+    @Override
+    public String getTitle(Task task) {
+        return task.getTitle();
+    }
+
+    @Override
+    public String getDescription(Task task) {
+        return task.getDescription();
+    }
+
+    @Override
+    public void changeTaskStatus(Task task, Task.TaskStatus newStatus) {
+        task.setStatus(newStatus);
+        updateHistory(task);
+    }
+
+    @Override
+    public Task findTaskById(String id) {
+        try {
+            Task task = tasks.get(id);
+            if (task != null) {
+                updateHistory(task);
+                return task;
+            } else {
+                throw new IllegalArgumentException("Task with ID " + id + " not found.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding task by ID: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeTaskById(String id) {
+        Task removedTask = tasks.remove(id);
+
+        if (removedTask != null) {
+            tasks.remove(id);
+        }
+
+        if (history.contains(removedTask)) {
+            history.remove(removedTask);
+        }
+    }
+
+    @Override
+    public void addSubtask(Subtask subtask) {
+        String subtaskId = subtask.getId();
+
+        subtasks.put(subtaskId, subtasks.getOrDefault(subtaskId, subtask));
+    }
+
+    @Override
+    public void attachSubtask(Task task, Subtask subtask) {
+        if (tasks.containsKey(task.getId())) {
+            task.addSubtask(subtask.getId(), subtask);
+            updateHistory(task);
+        } else {
+            System.out.println("Can not to attach subtask to task");
+        }
+    }
+
+    @Override
+    public boolean hasSubtasks(Task task, Subtask subtask) {
+        HashMap<String, Subtask> subtasks = task.getSubtasks();
+        return subtasks.containsKey(subtask.getId());
+    }
+
+    @Override
+    public String getId(Subtask subtask) {
+        return subtask.getId();
+    }
+
+    @Override
+    public String getTitle(Subtask subtask) {
+        return subtask.getTitle();
+    }
+
+    @Override
+    public String getDescription(Subtask subtask) {
+        return subtask.getDescription();
+    }
+
+    @Override
+    public Subtask findSubtaskById(String taskId, String id) {
+        List<Subtask> foundRecords = new ArrayList<>();
+        if (tasks.containsKey(taskId)) {
+            try {
+                Subtask subtask = subtasks.get(id);
+                foundRecords.add(subtask);
+                return subtask;
+            } catch (Exception e) {
+                throw new RuntimeException("Error finding task bu Id: " + e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String getSubtaskIdFromTask(Task foundRecords) {
+        StringBuilder subtaskIds = new StringBuilder();
+
+        if (foundRecords.hasSubtasks()) {
+            for (Subtask subtask : foundRecords.getSubtasks().values()) {
+                subtaskIds.append(subtask.getId()).append(", ");
+            }
+            subtaskIds.delete(subtaskIds.length() - 2, subtaskIds.length());
+        }
+
+        return subtaskIds.toString();
+    }
+
+    @Override
+    public void removeSubtaskById(String subtaskId) {
+
+    }
+
+    @Override
+    public void addEpic(Task... tasks) {
+        String epicId = uuidGenerator.generateUuid();
+        Epic epic = new Epic(epicId, (Task) Arrays.asList(tasks));
+        epics.put(epicId, epic);
+    }
+
+
+    @Override
+    public String getTitle(Epic epic) {
+        return epic.getTitle();
+    }
+
+    @Override
+    public void removeEpicById(String id) {
+
+    }
+
+    @Override
+    public void printTasks() {
+        System.out.println("Tasks:");
+        for (Task task : tasks.values()) {
+            System.out.println(task);
+        }
+    }
+
+    @Override
+    public void printSubtasks() {
+        System.out.println("Subtasks:");
+        for (Subtask subtask : subtasks.values()) {
+            System.out.println(subtask);
+        }
+    }
+
+
+    @Override
+    public void printTasksWithSubtasks() {
+        System.out.println("Tasks with subtasks:");
+        for (Task task : tasks.values()) {
+            if (task.hasSubtasks()) {
+                System.out.println(task);
+            }
+        }
+    }
+
+    @Override
+    public void printEpics() {
+        System.out.println("Epics:");
+        for (Epic epic : epics.values()) {
+            System.out.println(epic);
+        }
+    }
+
 
     @Override
     public List<Task> getHistory() {
         return new ArrayList<>(history);
     }
 
-    private void updateHistory(Task task) {
-        if (history.size() >= 10) {
-            history.removeFirst();
+    @Override
+    public void updateHistory(Task task) {
+        boolean taskExists = history.contains(task);
+
+        if (!taskExists) {
+            if (history.size() >= 10) {
+                history.removeFirst();
+            }
+            history.addLast(task);
         }
-        history.addLast(task);
     }
 
     @Override
-    public Task findTaskById(String taskId) {
-        Task task = tasks.get(taskId);
-        if (task != null) {
-            updateHistory(task);
+    public void printHistory() {
+        System.out.println("History:");
+        for (Task task : history) {
+            System.out.println(task);
         }
-        return task;
     }
 
     @Override
-    public Subtask findSubtaskById(String subtaskId) {
-        Subtask subtask = subtasks.get(subtaskId);
+    public void printFoundSubtask(Subtask subtask) {
         if (subtask != null) {
-            updateHistory(subtask);
-        }
-        return subtask;
-    }
-
-    @Override
-    public void removeById(String taskId) {
-        Task removedTask = tasks.remove(taskId);
-        if (removedTask != null) {
-            System.out.println("Task with id: " + taskId + " successfully removed.");
+            System.out.println("Found subtask:");
+            System.out.println(subtask);
         } else {
-            System.out.println("Task with id: " + taskId + " not found.");
+            System.out.println("Subtask not found.");
         }
     }
 
@@ -79,80 +245,19 @@ public class InMemoryTaskManager implements TaskManager {
         switch (taskType.toLowerCase()) {
             case "tasks":
                 tasks.clear();
-                System.out.println("Tasks cleared!");
+                System.out.println("Tasks clear!");
                 break;
             case "subtasks":
                 subtasks.clear();
-                System.out.println("Subtasks cleared!");
+                System.out.println("Subtasks clear!");
                 break;
             case "epics":
                 epics.clear();
-                System.out.println("Epics cleared!");
+                System.out.println("Epics clear!");
                 break;
             default:
-                System.out.println("Error occurred while clearing. Check the task type (tasks/subtasks/epic).");
+                System.out.println("Error, you can use: (tasks/subtasks/epic).");
         }
     }
 
-    @Override
-    public void createSubtask(Subtask subtask) {
-        String subtaskId = uuidGenerator.generateUuid();
-        subtasks.put(subtaskId, subtask);
-    }
-
-    @Override
-    public void addSubtaskToTask(Task task, Subtask subtask) {
-        String subtaskId = UUID.randomUUID().toString();
-        task.addSubtask(subtaskId, subtask);
-    }
-
-    @Override
-    public void createEpic(Epic epic) {
-        String epicId = uuidGenerator.generateUuid();
-        epics.put(epicId, epic);
-    }
-
-    @Override
-    public void printTasks() {
-        for (Map.Entry<String, Task> entry : tasks.entrySet()) {
-            String taskId = entry.getKey();
-            Task taskValue = entry.getValue();
-            System.out.println(String.format("TaskId: %s, TaskDesc: %s", taskId, taskValue));
-        }
-    }
-
-    @Override
-    public void printSubtasks() {
-        for (Map.Entry<String, Subtask> entry : subtasks.entrySet()) {
-            String subtaskId = entry.getKey();
-            Subtask subtaskValue = entry.getValue();
-            System.out.println(String.format("SubtaskId: %s, SubtaskDesc: %s", subtaskId, subtaskValue));
-        }
-    }
-
-    @Override
-    public void printTasksWithSubtasks() {
-        for (Map.Entry<String, Task> entry : tasks.entrySet()) {
-            String taskId = entry.getKey();
-            Task taskValue = entry.getValue();
-            if (!taskValue.getSubtasks().isEmpty()) {
-                System.out.println("Task with subtask:");
-                System.out.println(String.format("TaskId: %s, TaskDesc: %s", taskId, taskValue));
-                for (Map.Entry<String, Subtask> subtaskEntry : taskValue.getSubtasks().entrySet()) {
-                    String subtaskId = subtaskEntry.getKey();
-                    Subtask subtaskValue = subtaskEntry.getValue();
-                    System.out.println(String.format("  SubtaskId: %s, SubtaskDesc: %s", subtaskId, subtaskValue));
-                }
-            }
-        }
-    }
-
-    @Override
-    public void printEpics() {
-        for (Map.Entry<String, Epic> entry : epics.entrySet()) {
-            String epicId = entry.getKey();
-            Epic epicValue = entry.getValue();
-            System.out.println(String.format("EpicId: %s, EpicDesc: %s, Status: %s", epicId, epicValue.toString(), epicValue.getStatus()));
-        }
-    }
 }
