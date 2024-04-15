@@ -6,21 +6,21 @@ import java.util.UUID;
 public class SubtaskTest {
 
   @Test
-  public void testCreateSubtask() {
+  public void createSubtask() {
     Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
 
     assertNotNull(subtask.subtasks);
   }
 
   @Test
-  public void testGetId() {
+  public void getId() {
     Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
 
     assertNotNull(subtask.getId());
   }
 
   @Test
-  public void testIsIdEqualsUUID() {
+  public void isIdEqualsUUID() {
     Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
 
     assertTrue(isValidUIID(subtask.getId()));

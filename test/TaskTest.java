@@ -3,21 +3,21 @@ import org.junit.jupiter.api.Test;
 
 public class TaskTest {
   @Test
-  public void testCreateTask() {
+  public void createTask() {
     Task task = new Task("Доставка товаров", "Позвонить курьеру в день доставки");
 
     assertNotNull(task.tasks);
   }
 
   @Test
-  public void testTaskWithoutSubtask() {
+  public void TaskWithoutSubtask() {
     Task task = new Task("Доставка товаров", "Позвонить курьеру в день доставки");
 
     assertFalse(task.hasSubtasks());
   }
 
   @Test
-  public void testTaskHasSubtasks() {
+  public void TaskHasSubtasks() {
     Task task = new Task("Доставка товаров", "Позвонить курьеру в день доставки");
     Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
 
@@ -32,7 +32,7 @@ public class TaskTest {
   }
 
   @Test
-  public void testCanChangeTaskTitle() {
+  public void canChangeTaskTitle() {
     Task task = new Task("Доставка товаров", "Позвонить курьеру в день доставки");
     task.createTask();
 
@@ -44,7 +44,7 @@ public class TaskTest {
   }
 
   @Test
-  public void testCanChangeTaskDescription() {
+  public void canChangeTaskDescription() {
     Task task = new Task("Доставка товаров", "Позвонить курьеру в день доставки");
     task.createTask();
 
@@ -56,6 +56,6 @@ public class TaskTest {
   }
 
   @Test
-  public void testTaskHasBeenRemoved() {
+  public void taskHasBeenRemoved() {
   }
 }
