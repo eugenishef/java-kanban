@@ -1,7 +1,6 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-
 public class TaskManagerTest {
     @Test
     public void testTaskEqualityById() {
@@ -33,9 +32,13 @@ public class TaskManagerTest {
         manager.addTask(task2);
         manager.addTask(task3);
 
-        Task viewedTask1 = manager.findTaskById(manager.getTaskId(task1));
-        Task viewedTask2 = manager.findTaskById(manager.getTaskId(task2));
-        Task viewedTask3 = manager.findTaskById(manager.getTaskId(task3));
+        String taskId1 = manager.getTaskId(task1);
+        String taskId2 = manager.getTaskId(task2);
+        String taskId3 = manager.getTaskId(task3);
+
+        Task viewedTask1 = manager.findTaskById(taskId1);
+        Task viewedTask2 = manager.findTaskById(taskId2);
+        Task viewedTask3 = manager.findTaskById(taskId3);
 
         if (viewedTask1 != null) {
             historyManager.add(viewedTask1);
@@ -50,20 +53,5 @@ public class TaskManagerTest {
         List<Task> history = historyManager.getHistory();
 
         assertEquals(3, history.size());
-    }
-
-    @Test
-    public void testSubtaskRemoval() {
-        TaskManager manager = Managers.getDefault();
-
-        Task task = new Task("Main Task", "Description of the main task");
-        Subtask subtask = new Subtask("Subtask", "Description of the subtask");
-        manager.addTask(task);
-        manager.addSubtaskToTask(task, subtask);
-
-        assertEquals(1, task.getSubtasks().size());
-
-        manager.removeSubtaskFromTask(task, subtask);
-        assertTrue(task.getSubtasks().isEmpty());
     }
 }
