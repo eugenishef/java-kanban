@@ -175,4 +175,19 @@ public class InMemoryTaskManagerTest {
     Subtask resultWhenSubtaskAddedToTask = taskManager.findSubtaskById(taskId, subtaskId);
     //assertEquals(subtask, resultWhenSubtaskAddedToTask, "Подзадача не найдена в задаче");
   }
+
+  @Test
+  void addEpic() {
+    Task task_1 = new Task("Задача 1", "Описание");
+    Task task_2 = new Task("Задача 2", "Описание");
+    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Epic epic = new Epic("Эпический проект", task_1);
+
+    taskManager.addTask(task_1);
+    taskManager.addSubtask(subtask);
+    taskManager.attachSubtask(task_1, subtask);
+
+    taskManager.addEpic(epic);
+    taskManager.printEpics();
+  }
 }

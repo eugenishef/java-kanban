@@ -20,7 +20,7 @@ public interface TaskManager {
     Subtask findSubtaskById(String taskId, String subtaskId);
     String getSubtaskIdFromTask(Task foundRecords);
     void removeSubtaskById(String subtaskId);
-    void addEpic(Task... tasks);
+    void addEpic(Epic epic, Task... tasks);
     String getTitle(Epic epic);
     void removeEpicById(String id);
     void printTasks();

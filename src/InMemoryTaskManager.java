@@ -3,7 +3,7 @@ import java.util.*;
 public class InMemoryTaskManager implements TaskManager {
     protected HashMap<String, Task> tasks;
     protected HashMap<String, Subtask> subtasks;
-    protected HashMap<String, Epic> epics;
+    protected HashMap<String, ArrayList<Task>> epics;
     private LinkedList<Task> history;
 
     UUIDGenerator uuidGenerator;
@@ -152,12 +152,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addEpic(Task... tasks) {
+    public void addEpic(Epic epic, Task... tasks) {
         String epicId = uuidGenerator.generateUuid();
-        Epic epic = new Epic(epicId, (Task) Arrays.asList(tasks));
-        epics.put(epicId, epic);
-    }
+        ArrayList<Task> epicTasks = new ArrayList<>();
 
+        for (Task task : tasks) {
+            epicTasks.add(task);
+        }
+
+        epics.put(epicId, epic);
+        epic.addTasks(epicTasks);
+    }
 
     @Override
     public String getTitle(Epic epic) {
@@ -185,7 +190,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
     @Override
     public void printTasksWithSubtasks() {
         System.out.println("Tasks with subtasks:");
@@ -199,11 +203,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void printEpics() {
         System.out.println("Epics:");
-        for (Epic epic : epics.values()) {
+        for (ArrayList<Task> epic : epics.values()) {
             System.out.println(epic);
         }
     }
-
 
     @Override
     public List<Task> getHistory() {
