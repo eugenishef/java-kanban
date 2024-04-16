@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-  private String filePath;
+  private final String filePath;
 
   public FileBackedTaskManager(String filePath) {
     super();
@@ -23,7 +23,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         writer.write("EPIC," + getId((Epic) epic) + "," + getTitle((Epic) epic) + ",," + getStatusFromTasks((Epic) epic) + "," + getNestedElements((Epic) epic) + "\n");
       }
     } catch (IOException e) {
-      System.out.println("Error when saving to a file: " + e.getMessage());
+      System.out.println(String.format("Error when saving to a file: %s", e.getMessage()));
     }
   }
 
@@ -70,7 +70,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
       }
     } catch (IOException e) {
-      System.out.println("Error reading file: " + e.getMessage());
+      System.out.println(String.format("Error reading file: %s", e.getMessage()));
     }
   }
 }

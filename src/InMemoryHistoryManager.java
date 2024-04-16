@@ -101,7 +101,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         for (Map.Entry<String, Node> entry : nodeMap.entrySet()) {
             String taskId = entry.getKey();
             Node node = entry.getValue();
-            System.out.println("Task ID: " + taskId + ", Node Value: " + node.task);
+            System.out.println(String.format("Task ID: %s, Node Value: %s", taskId, node.task));
         }
     }
 }
