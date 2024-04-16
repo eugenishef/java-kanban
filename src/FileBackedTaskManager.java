@@ -43,27 +43,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
   public void loadFromFile(File file) {
     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String line;
+      boolean isFirstLine = true;
       while ((line = reader.readLine()) != null) {
+        if (isFirstLine) {
+          isFirstLine = false;
+          continue;
+        }
         String[] parts = line.split(",");
         if (parts.length < 4) {
           continue;
         }
-        String type = parts[1];
+        String type = parts[0];
         String title = parts[2];
         String description = parts[3];
 
-        if (type.equals("TASK")) {
+        if (type.equals("TASK") || type.equals("EPIC")) {
           Task task = new Task(title, description);
-          task.setStatus(Task.TaskStatus.valueOf(parts[4]));
+          changeTaskStatus(task, Task.TaskStatus.valueOf(parts[4]));
           addTask(task);
-        } else if (type.equals("SUBTASK")) {
+
+          Epic epic = new Epic(title, task);
+          addEpic(epic);
+        } if (type.equals("SUBTASK")) {
           Subtask subtask = new Subtask(title, description);
-          subtask.setStatus(Task.TaskStatus.valueOf(parts[4]));
           addSubtask(subtask);
-          attachSubtask(findTaskById(parts[0]), subtask);
-        } else if (type.equals("EPIC")) {
-          Epic epic = new Epic(title, null);
-          epics.put(parts[0], epic);
         }
       }
     } catch (IOException e) {

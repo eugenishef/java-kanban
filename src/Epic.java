@@ -38,5 +38,4 @@ public class Epic extends ArrayList<Task> {
         }
         return stringBuilder.toString();
     }
-
 }

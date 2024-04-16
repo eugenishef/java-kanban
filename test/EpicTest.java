@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 public class EpicTest {
   @Test
   public void createEpic() {
-    Task task = new Task("Доставка товаров", "Позвонить курьеру в день доставки");
-    Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
-    Epic epic = new Epic("Разобраться с доставкой", task);
+    Task task = new Task("Delivery of goods", "Call the courier on the day of delivery");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    Epic epic = new Epic("Difficulties of an introvert", task);
 
     task.createTask();
     subtask.createSubtask();

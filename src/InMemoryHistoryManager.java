@@ -98,7 +98,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     public void printNodeMap() {
-        System.out.println("Содержимое nodeMap:");
         for (Map.Entry<String, Node> entry : nodeMap.entrySet()) {
             String taskId = entry.getKey();
             Node node = entry.getValue();

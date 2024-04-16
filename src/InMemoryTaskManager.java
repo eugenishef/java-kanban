@@ -24,6 +24,10 @@ public class InMemoryTaskManager implements TaskManager {
         return subtasks;
     }
 
+    public HashMap<String, ArrayList<Task>> getEpics() {
+        return epics;
+    }
+
     @Override
     public void addTask(Task task) {
         String taskId = task.getId();
@@ -188,7 +192,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpicById(String id) {
-
+        epics.remove(id);
     }
 
     @Override

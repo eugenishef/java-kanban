@@ -13,7 +13,7 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testAddTask() {
-    Task task = new Task("Задача 1", "Описание");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
 
     taskManager.addTask(task);
 
@@ -22,40 +22,40 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testGetTaskId() {
-    Task task = new Task("Задача 1", "Описание");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
 
     taskManager.addTask(task);
 
     String currentId = task.getId();
 
-    assertEquals(task.getId(), currentId, "Значения id должны совпадать");
+    assertEquals(task.getId(), currentId, "The id values must be match");
   }
 
   @Test
   void testGetTaskTitle() {
-    Task task = new Task("Задача 1", "Описание");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
 
     taskManager.addTask(task);
 
     String currentTitle = task.getTitle();
 
-    assertEquals(task.getTitle(), currentTitle, "Title должны совпадать");
+    assertEquals(task.getTitle(), currentTitle, "Title values must be match");
   }
 
   @Test
   void testGetTaskDescription() {
-    Task task = new Task("Задача 1", "Описание");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
 
     taskManager.addTask(task);
 
     String currentDescription = task.getDescription();
 
-    assertEquals(task.getDescription(), currentDescription, "Description должны совпадать");
+    assertEquals(task.getDescription(), currentDescription, "Description values must be match");
   }
 
   @Test
   void testChangeTaskStatus() {
-    Task task = new Task("Задача 1", "Описание");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
 
     taskManager.addTask(task);
 
@@ -65,12 +65,12 @@ public class InMemoryTaskManagerTest {
 
     Task.TaskStatus changedStatus  = task.getStatus();
 
-    assertNotEquals(defaultStatus, changedStatus, "Статусы должны различаться");
+    assertNotEquals(defaultStatus, changedStatus, "The statuses should be different");
   }
 
   @Test
   void testFindTaskById() {
-    Task task = new Task("Задача 1", "Описание");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
 
     taskManager.addTask(task);
 
@@ -78,14 +78,14 @@ public class InMemoryTaskManagerTest {
 
     Task result = taskManager.findTaskById(requiredId);
 
-    assertNotNull(result, "Задача не найдена по id");
-    assertEquals(task, result, "Найденная и добавленная задача должны совпадать");
+    assertNotNull(result, "The task was not found by id");
+    assertEquals(task, result, "The found and added task must match");
   }
 
   @Test
   void testRemoveTaskById() {
-    Task task_1 = new Task("Задача 1", "Описание");
-    Task task_2 = new Task("Задача 2", "Описание");
+    Task task_1 = new Task("Make a report", "Collect data and prepare a report on the project");
+    Task task_2 = new Task("Prepare materials", "Collect all the necessary documents");
 
     taskManager.addTask(task_1);
     taskManager.addTask(task_2);
@@ -98,12 +98,12 @@ public class InMemoryTaskManagerTest {
 
     int lengthAfter = taskManager.getTasks().size();
 
-    assertNotEquals(lengthBefore, lengthAfter, "Длинна tasks осталось без изменений, механизм удаления задачи не сработал");
+    assertNotEquals(lengthBefore, lengthAfter, "The length of tasks remained unchanged, the task deletion mechanism did not work");
   }
 
   @Test
   void testAddSubtask() {
-    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     taskManager.addSubtask(subtask);
 
@@ -112,8 +112,8 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testAddSubtaskToTask() {
-    Task task = new Task("Задача 1", "Описание");
-    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     taskManager.addTask(task);
     taskManager.addSubtask(subtask);
@@ -126,41 +126,41 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testGetSubtaskId() {
-    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     taskManager.addSubtask(subtask);
 
     String currentId = subtask.getId();
 
-    assertEquals(subtask.getId(), currentId, "Значения id должны совпадать");
+    assertEquals(subtask.getId(), currentId, "The ID values must be match");
   }
 
   @Test
   void testGetSubtaskTitle() {
-    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     taskManager.addSubtask(subtask);
 
     String currentTitle = subtask.getTitle();
 
-    assertEquals(subtask.getTitle(), currentTitle, "Title должны совпадать");
+    assertEquals(subtask.getTitle(), currentTitle, "Title values must be match");
   }
 
   @Test
   void testGetSubtaskDescription() {
-    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     taskManager.addSubtask(subtask);
 
     String currentDescription = subtask.getDescription();
 
-    assertEquals(subtask.getDescription(), currentDescription, "Description должны совпадать");
+    assertEquals(subtask.getDescription(), currentDescription, "Description values must be match");
   }
 
   @Test
   void testFindSubtaskInTaskById() {
-    Task task = new Task("Задача 1", "Описание");
-    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     taskManager.addTask(task);
     taskManager.addSubtask(subtask);
@@ -169,18 +169,13 @@ public class InMemoryTaskManagerTest {
     String subtaskId = task.getId();
 
     Subtask resultWhenSubtaskNotAddedToTask = taskManager.findSubtaskById(taskId, subtaskId);
-    assertEquals(null, resultWhenSubtaskNotAddedToTask,"Как сюда попала подзадача?");
-
-    taskManager.attachSubtask(task, subtask);
-    Subtask resultWhenSubtaskAddedToTask = taskManager.findSubtaskById(taskId, subtaskId);
-    //assertEquals(subtask, resultWhenSubtaskAddedToTask, "Подзадача не найдена в задаче");
+    assertEquals(null, resultWhenSubtaskNotAddedToTask,"How did the subtask get here?");
   }
 
   @Test
   void addEpic() {
-    Task task_1 = new Task("Задача 1", "Описание");
-    Task task_2 = new Task("Задача 2", "Описание");
-    Subtask subtask = new Subtask("Подзадача", "К задаче");
+    Task task_1 = new Task("Make a report", "Collect data and prepare a report on the project");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
     Epic epic = new Epic("Эпический проект", task_1);
 
     taskManager.addTask(task_1);
