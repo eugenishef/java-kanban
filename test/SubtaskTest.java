@@ -7,21 +7,21 @@ public class SubtaskTest {
 
   @Test
   public void createSubtask() {
-    Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     assertNotNull(subtask.subtasks);
   }
 
   @Test
   public void getId() {
-    Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     assertNotNull(subtask.getId());
   }
 
   @Test
   public void isIdEqualsUUID() {
-    Subtask subtask = new Subtask("Позвонить в тех. поддержку", "Узнать ФИО и номер курьера");
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
 
     assertTrue(isValidUIID(subtask.getId()));
   }

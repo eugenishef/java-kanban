@@ -8,8 +8,8 @@ public class HistoryManagerTest {
     HistoryManager historyManager = new InMemoryHistoryManager();
     TaskManager manager = new InMemoryTaskManager();
 
-    Task task1 = new Task("Задача 1", "Описание 1");
-    Task task2 = new Task("Задача 2", "Описание 2");
+    Task task1 = new Task("Make a report", "Collect data and prepare a report on the project");
+    Task task2 = new Task("Prepare materials", "Collect all the necessary documents");
 
     manager.addTask(task1);
     manager.addTask(task2);
