@@ -197,35 +197,31 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void printTasks() {
-        System.out.println("Tasks:");
         for (Task task : tasks.values()) {
-            System.out.println(task);
+            System.out.println(String.format("Tasks:\n%s", task));
         }
     }
 
     @Override
     public void printSubtasks() {
-        System.out.println("Subtasks:");
         for (Subtask subtask : subtasks.values()) {
-            System.out.println(subtask);
+            System.out.println(String.format("Subtasks:\n%s", subtask));
         }
     }
 
     @Override
     public void printTasksWithSubtasks() {
-        System.out.println("Tasks with subtasks:");
         for (Task task : tasks.values()) {
             if (task.hasSubtasks()) {
-                System.out.println(task);
+                System.out.println(String.format("Tasks with subtasks:\n%s", task));
             }
         }
     }
 
     @Override
     public void printEpics() {
-        System.out.println("Epics:");
         for (ArrayList<Task> epic : epics.values()) {
-            System.out.println(epic);
+            System.out.println(String.format("Epics:\n%s", epic));
         }
     }
 
@@ -248,17 +244,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void printHistory() {
-        System.out.println("History:");
         for (Task task : history) {
-            System.out.println(task);
+            System.out.println(String.format("History:\n%s",task));
         }
     }
 
     @Override
     public void printFoundSubtask(Subtask subtask) {
         if (subtask != null) {
-            System.out.println("Found subtask:");
-            System.out.println(subtask);
+            System.out.println(String.format("Found subtask:\n%s",subtask));
         } else {
             System.out.println("Subtask not found.");
         }

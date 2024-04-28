@@ -97,11 +97,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         return new ArrayList<>(history);
     }
 
-    public void printNodeMap() {
+    public void printHistoryState() {
         for (Map.Entry<String, Node> entry : nodeMap.entrySet()) {
-            String taskId = entry.getKey();
             Node node = entry.getValue();
-            System.out.println(String.format("Task ID: %s, Node Value: %s", taskId, node.task));
+            System.out.println(String.format("History state:\n%s",node.task));
         }
     }
 }
