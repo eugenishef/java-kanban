@@ -1,25 +1,33 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 public class TaskTest {
   @Test
   public void createTask() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
 
     assertNotNull(task.tasks);
   }
 
   @Test
   public void TaskWithoutSubtask() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
 
     assertFalse(task.hasSubtasks());
   }
 
   @Test
   public void TaskHasSubtasks() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     task.createTask();
     subtask.createSubtask();
@@ -33,7 +41,9 @@ public class TaskTest {
 
   @Test
   public void canChangeTaskTitle() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
     task.createTask();
 
     String previousTitle = task.getTitle();
@@ -45,7 +55,9 @@ public class TaskTest {
 
   @Test
   public void canChangeTaskDescription() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
     task.createTask();
 
     String previousDescription = task.getDescription();

@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
     HashMap<String, Task> getTasks();
@@ -34,5 +35,6 @@ public interface TaskManager {
     void printHistory();
     void printFoundSubtask(Subtask subtask);
     void removeAll(String taskType);
-    default void save() {}
+    default void save() {};
+    TreeSet<Task> getPrioritizedTasks();
 }

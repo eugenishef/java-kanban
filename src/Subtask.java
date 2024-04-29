@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class Subtask extends Task {
@@ -7,8 +8,8 @@ public class Subtask extends Task {
 
     protected HashMap<String, Subtask> subtasks = new HashMap<>();
 
-    public Subtask(String title, String description) {
-        super(title, description);
+    public Subtask(String title, String description, LocalDateTime startTime, long durationMinutes) {
+        super(title, description, startTime, durationMinutes);
         this.id = uuidGenerator.generateUuid();
         this.status = TaskStatus.NEW;
     }

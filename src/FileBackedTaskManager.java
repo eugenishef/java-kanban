@@ -1,4 +1,6 @@
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -11,12 +13,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
   public void saveToFile() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-      writer.write("type,id,title,description,status,nestedElement\n");
+      writer.write("type,id,title,description,status,nestedElement,startTime,duration\n");
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
       for (Task task : tasks.values()) {
         String nestedElement = task.getSubtasks().isEmpty() ? "" : "HAS_SUBTASK";
-        writer.write(  "TASK," + getId(task) + "," + getTitle(task) + "," + getDescription(task) + "," + task.getStatus() + "," + nestedElement + "\n");
+        String formattedStartTime = task.getStartTime() != null ? task.getStartTime().format(formatter) : "";
+        long durationMinutes = task.getDuration() != null ? task.getDuration().toMinutes() : 0;
+
+        writer.write(  "TASK," + getId(task) + "," + getTitle(task) + "," + getDescription(task) + "," + task.getStatus() + "," + nestedElement + "," + formattedStartTime + "," + durationMinutes +"\n");
         for (Subtask subtask : subtasks.values()) {
-          writer.write("SUBTASK," + getId(subtask) + "," + getTitle(subtask) + "," + getDescription(subtask) + "," + subtask.getStatus() + "\n");
+          String startTime = subtask.getStartTime() != null ? subtask.getStartTime().format(formatter) : "";
+          long duration = subtask.getDuration() != null ? subtask.getDuration().toMinutes() : 0;
+          writer.write("SUBTASK," + getId(subtask) + "," + getTitle(subtask) + "," + getDescription(subtask) + "," + subtask.getStatus() + "," + startTime + "," + duration + "\n");
         }
       }
       for (ArrayList<Task> epic : epics.values()) {
@@ -44,6 +53,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String line;
       boolean isFirstLine = true;
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
       while ((line = reader.readLine()) != null) {
         if (isFirstLine) {
           isFirstLine = false;
@@ -56,16 +67,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String type = parts[0];
         String title = parts[2];
         String description = parts[3];
+        LocalDateTime startTime = LocalDateTime.parse(parts[5], formatter);
+        long durationMinutes = Long.parseLong(parts[6]);
 
         if (type.equals("TASK") || type.equals("EPIC")) {
-          Task task = new Task(title, description);
+          Task task = new Task(title, description, startTime, durationMinutes);
           changeTaskStatus(task, Task.TaskStatus.valueOf(parts[4]));
           addTask(task);
 
           Epic epic = new Epic(title, task);
           addEpic(epic);
         } if (type.equals("SUBTASK")) {
-          Subtask subtask = new Subtask(title, description);
+          Subtask subtask = new Subtask(title, description, startTime, durationMinutes);
           addSubtask(subtask);
         }
       }
