@@ -1,0 +1,3 @@
+type,id,title,description,status,nestedElement
+TASK,6476ee8c-dd5b-46b3-a56b-7cb47a5209c5,Delivery of goods,Call the courier on the day of delivery,NEW,
+EPIC,141233b2-8c3f-403b-9bcf-1438be3dafec,Difficulties of an introvert,,NEW,

@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -5,6 +6,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected HashMap<String, Subtask> subtasks;
     protected HashMap<String, ArrayList<Task>> epics;
     private LinkedList<Task> history;
+    private TreeSet<Task> prioritizedTasks;
 
     UUIDGenerator uuidGenerator;
 
@@ -14,6 +16,26 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks = new HashMap<>();
         epics = new HashMap<>();
         history = new LinkedList<>();
+        prioritizedTasks = new TreeSet<>(Comparator.comparing((Task task) -> {
+            if (task instanceof Subtask) {
+                return ((Subtask) task).getStartTime();
+            } else {
+                return task.getStartTime();
+            }
+        }, Comparator.nullsLast(Comparator.naturalOrder())));
+    }
+
+    private boolean isTimeOverlap(Task task_1, Task task_2) {
+        LocalDateTime start_1 = task_1.getStartTime();
+        LocalDateTime end_1 = task_1.getEndTime();
+        LocalDateTime start_2 = task_2.getStartTime();
+        LocalDateTime end_2 = task_2.getEndTime();
+
+        if (start_1 == null || start_2 == null) {
+            return false;
+        }
+
+        return start_1.isBefore(end_2) && start_2.isBefore(end_1);
     }
 
     public HashMap<String, Task> getTasks() {
@@ -29,9 +51,25 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public TreeSet<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+
+    @Override
     public void addTask(Task task) {
         String taskId = task.getId();
-        tasks.put(taskId, tasks.getOrDefault(taskId, task));
+        boolean isOverlap = prioritizedTasks.stream().anyMatch(existingTask -> isTimeOverlap(task, existingTask));
+
+        if (task.getStartTime() != null) {
+            prioritizedTasks.add(task);
+        }
+
+        if (!isOverlap) {
+            tasks.put(taskId, tasks.getOrDefault(taskId, task));
+            prioritizedTasks.add(task);
+        } else {
+            System.out.println("Task time overlaps with an existing task.");
+        }
     }
 
     @Override
@@ -86,8 +124,18 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addSubtask(Subtask subtask) {
         String subtaskId = subtask.getId();
+        boolean isOverlap = prioritizedTasks.stream().anyMatch(existingTask -> isTimeOverlap(subtask, existingTask));
 
-        subtasks.put(subtaskId, subtasks.getOrDefault(subtaskId, subtask));
+        if (subtask.getStartTime() != null) {
+            prioritizedTasks.add(subtask);
+        }
+
+        if (!isOverlap) {
+            subtasks.put(subtaskId, subtasks.getOrDefault(subtaskId, subtask));
+            prioritizedTasks.add(subtask);
+        } else {
+            System.out.println("Subtask time overlaps with an existing task.");
+        }
     }
 
     @Override

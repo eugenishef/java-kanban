@@ -1,27 +1,34 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class SubtaskTest {
 
   @Test
   public void createSubtask() {
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     assertNotNull(subtask.subtasks);
   }
 
   @Test
   public void getId() {
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     assertNotNull(subtask.getId());
   }
 
   @Test
   public void isIdEqualsUUID() {
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     assertTrue(isValidUIID(subtask.getId()));
   }

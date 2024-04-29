@@ -1,3 +1,5 @@
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class Task {
@@ -6,15 +8,39 @@ public class Task {
     private String description;
     private TaskStatus status;
     private static UUIDGenerator uuidGenerator = new UUIDGenerator();
+    private LocalDateTime startTime;
+    private Duration duration;
 
     protected HashMap<String, Task> tasks = new HashMap<>();
     protected HashMap<String, Subtask> localTasksWithSubtasks = new HashMap<>();
 
-    public Task(String title, String description) {
+    public Task(String title, String description, LocalDateTime startTime, long durationMinutes) {
         this.id = uuidGenerator.generateUuid();
         this.title = title;
         this.description = description;
         this.status = TaskStatus.NEW;
+        this.startTime = startTime;
+        this.duration = Duration.ofMinutes(durationMinutes);
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long durationMinutes) {
+        this.duration = Duration.ofMinutes(durationMinutes);
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     public String getId() {
@@ -90,7 +116,9 @@ public class Task {
             .append("id: ").append(id)
             .append(", title='").append(title).append('\'')
             .append(", description='").append(description).append('\'')
-            .append(", status=").append(status);
+            .append(", status=").append(status)
+            .append(", startTime=").append(startTime)
+            .append(", duration=").append(duration.toMinutes()).append(" minutes");
 
         if (!localTasksWithSubtasks.isEmpty()) {
             stringBuilder.append(", subtasks=[");
@@ -105,6 +133,7 @@ public class Task {
         stringBuilder.append("}");
         return stringBuilder.toString();
     }
+
 
     public enum TaskStatus {
         NEW, IN_PROGRESS, DONE

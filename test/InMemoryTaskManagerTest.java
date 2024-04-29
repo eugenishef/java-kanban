@@ -1,6 +1,11 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.TreeSet;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryTaskManagerTest {
@@ -13,16 +18,35 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testAddTask() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime_1 = LocalDateTime.of(2024, 4, 29, 13, 30);
+    LocalDateTime startTime_2 = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task_1 = new Task("Make a report", "Collect data and prepare a report on the project", startTime_1, durationMinutes);
+    Task task_2 = new Task("Make a report", "Collect data and prepare a report on the project", startTime_2, durationMinutes);
 
-    taskManager.addTask(task);
+    taskManager.addTask(task_1);
+    taskManager.addTask(task_2);
+    taskManager.printTasks();
 
     assertFalse(taskManager.getTasks().isEmpty());
   }
 
   @Test
+  void testTaskDurationAndStartTime() {
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
+
+    assertEquals(startTime, task.getStartTime());
+    assertEquals(Duration.ofMinutes(durationMinutes), task.getDuration());
+    assertEquals(startTime.plusMinutes(durationMinutes), task.getEndTime());
+  }
+
+  @Test
   void testGetTaskId() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
 
     taskManager.addTask(task);
 
@@ -33,7 +57,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testGetTaskTitle() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
 
     taskManager.addTask(task);
 
@@ -44,7 +70,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testGetTaskDescription() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
 
     taskManager.addTask(task);
 
@@ -55,7 +83,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testChangeTaskStatus() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
 
     taskManager.addTask(task);
 
@@ -70,7 +100,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testFindTaskById() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
 
     taskManager.addTask(task);
 
@@ -84,8 +116,10 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testRemoveTaskById() {
-    Task task_1 = new Task("Make a report", "Collect data and prepare a report on the project");
-    Task task_2 = new Task("Prepare materials", "Collect all the necessary documents");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task_1 = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
+    Task task_2 = new Task("Prepare materials", "Collect all the necessary documents", startTime, durationMinutes);
 
     taskManager.addTask(task_1);
     taskManager.addTask(task_2);
@@ -103,7 +137,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testAddSubtask() {
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     taskManager.addSubtask(subtask);
 
@@ -112,8 +148,10 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testAddSubtaskToTask() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     taskManager.addTask(task);
     taskManager.addSubtask(subtask);
@@ -126,7 +164,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testGetSubtaskId() {
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     taskManager.addSubtask(subtask);
 
@@ -137,7 +177,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testGetSubtaskTitle() {
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     taskManager.addSubtask(subtask);
 
@@ -148,7 +190,9 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testGetSubtaskDescription() {
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     taskManager.addSubtask(subtask);
 
@@ -159,8 +203,10 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void testFindSubtaskInTaskById() {
-    Task task = new Task("Make a report", "Collect data and prepare a report on the project");
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
+    Task task = new Task("Make a report", "Collect data and prepare a report on the project", startTime, durationMinutes);
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
 
     taskManager.addTask(task);
     taskManager.addSubtask(subtask);
@@ -174,15 +220,63 @@ public class InMemoryTaskManagerTest {
 
   @Test
   void addEpic() {
-    Task task_1 = new Task("Make a report", "Collect data and prepare a report on the project");
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
-    Epic epic = new Epic("Эпический проект", task_1);
+    LocalDateTime startTime_1 = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes_1 = 60;
 
-    taskManager.addTask(task_1);
-    taskManager.addSubtask(subtask);
-    taskManager.attachSubtask(task_1, subtask);
+    LocalDateTime startTime_2 = LocalDateTime.of(2024, 4, 29, 14, 30);
+    long durationMinutes_2 = 30;
+
+    Task task_1 = new Task("Make a report", "Collect data and prepare a report on the project", startTime_1, durationMinutes_1);
+    Subtask subtask_1 = new Subtask("Call technical support", "Find out the courier's full name and number", startTime_1, durationMinutes_1);
+    Subtask subtask_2 = new Subtask("Write introduction", "Write an introduction for the report", startTime_2, durationMinutes_2);
+    Epic epic = new Epic("Epic project", task_1);
+
+    taskManager.addSubtask(subtask_1);
+    taskManager.addSubtask(subtask_2);
+
+    epic.add(subtask_1);
+    epic.add(subtask_2);
 
     taskManager.addEpic(epic);
     taskManager.printEpics();
+  }
+
+  @Test
+  void testGetPrioritizedTasks() {
+    LocalDateTime startTime_1 = LocalDateTime.of(2024, 4, 29, 9, 0);
+    LocalDateTime startTime_2 = LocalDateTime.of(2024, 4, 29, 10, 0);
+    LocalDateTime startTime_3 = LocalDateTime.of(2024, 4, 29, 11, 0);
+
+    Task task_1 = new Task("Call technical support", "Find out the courier's full name and number", startTime_1, 30);
+    Task task_2 = new Task("Write introduction", "Write an introduction for the report", startTime_2, 45);
+    Subtask subtask_1 = new Subtask("Subtask 1", "Collect data and prepare a report on the project", startTime_3, 15);
+
+    taskManager.addTask(task_1);
+    taskManager.addTask(task_2);
+    taskManager.addSubtask(subtask_1);
+
+    TreeSet<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+    assertNotNull(prioritizedTasks);
+    assertEquals(3, prioritizedTasks.size());
+
+    System.out.println("Prioritized Tasks:");
+    Iterator<Task> iterator = prioritizedTasks.iterator();
+    assertTrue(iterator.hasNext());
+    Task first = iterator.next();
+    assertEquals(task_1, first);
+    System.out.println(first.getTitle() + " - " + first.getStartTime());
+
+    assertTrue(iterator.hasNext());
+    Task second = iterator.next();
+    assertEquals(task_2, second);
+    System.out.println(second.getTitle() + " - " + second.getStartTime());
+
+    assertTrue(iterator.hasNext());
+    Task third = iterator.next();
+    assertEquals(subtask_1, third);
+    System.out.println(third.getTitle() + " - " + third.getStartTime());
+
+    assertFalse(iterator.hasNext());
   }
 }

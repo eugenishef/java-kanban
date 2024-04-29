@@ -2,6 +2,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,9 +20,11 @@ public class FileBackedTaskManagerTest {
   @Test
   void testSaveToFile() {
     FileBackedTaskManager taskManager = new FileBackedTaskManager(fileName);
+    LocalDateTime startTime = LocalDateTime.of(2024, 4, 29, 13, 30);
+    long durationMinutes = 60;
 
-    Task task = new Task("Delivery of goods", "Call the courier on the day of delivery");
-    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number");
+    Task task = new Task("Delivery of goods", "Call the courier on the day of delivery", startTime, durationMinutes);
+    Subtask subtask = new Subtask("Call technical support", "Find out the courier's full name and number", startTime, durationMinutes);
     Epic epic = new Epic("Difficulties of an introvert", task);
 
     taskManager.addTask(task);
