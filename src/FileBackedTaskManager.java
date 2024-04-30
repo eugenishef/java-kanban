@@ -1,7 +1,7 @@
 import java.io.*;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
   private final String filePath;
@@ -13,40 +13,61 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
   public void saveToFile() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-      writer.write("type,id,title,description,status,nestedElement,startTime,duration\n");
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+      writer.write("type,id,title,description,status,startTime,duration\n");
 
       for (Task task : tasks.values()) {
-        String nestedElement = task.getSubtasks().isEmpty() ? "" : "HAS_SUBTASK";
-        String formattedStartTime = task.getStartTime() != null ? task.getStartTime().format(formatter) : "";
-        long durationMinutes = task.getDuration() != null ? task.getDuration().toMinutes() : 0;
+        String startTime = String.valueOf(task.getStartTime());
+        Duration duration = task.getDuration();
+        String taskInfo = String.join(",",
+            "TASK",
+            getId(task),
+            getTitle(task),
+            getDescription(task),
+            task.getStatus().toString(),
+            startTime,
+            String.valueOf(duration.toMinutes())
+        );
 
-        writer.write(  "TASK," + getId(task) + "," + getTitle(task) + "," + getDescription(task) + "," + task.getStatus() + "," + nestedElement + "," + formattedStartTime + "," + durationMinutes +"\n");
-        for (Subtask subtask : subtasks.values()) {
-          String startTime = subtask.getStartTime() != null ? subtask.getStartTime().format(formatter) : "";
-          long duration = subtask.getDuration() != null ? subtask.getDuration().toMinutes() : 0;
-          writer.write("SUBTASK," + getId(subtask) + "," + getTitle(subtask) + "," + getDescription(subtask) + "," + subtask.getStatus() + "," + startTime + "," + duration + "\n");
-        }
+        taskInfo += "\n";
+        writer.write(taskInfo);
       }
-      for (ArrayList<Task> epic : epics.values()) {
-        writer.write("EPIC," + getId((Epic) epic) + "," + getTitle((Epic) epic) + ",," + getStatusFromTasks((Epic) epic) + "," + getNestedElements((Epic) epic) + "\n");
+
+      for (Subtask subtask : subtasks.values()) {
+        String startTime = String.valueOf(subtask.getStartTime());
+        Duration duration = subtask.getDuration();
+        String subtaskInfo = String.join(",",
+            "SUBTASK",
+            getId(subtask),
+            getTitle(subtask),
+            getDescription(subtask),
+            subtask.getStatus().toString(),
+            startTime,
+            String.valueOf(duration.toMinutes())
+        );
+        subtaskInfo += "\n";
+        writer.write(subtaskInfo);
+      }
+
+      for (Epic epic : epics.values()) {
+        String startTime = String.valueOf(epic.getStartTime());
+        String endTime = String.valueOf(epic.getEndTime());
+        Duration duration = epic.getDuration();
+
+        String epicInfo = String.join(",",
+            "EPIC",
+            getId(epic),
+            getTitle(epic),
+            getStatusFromTasks(epic),
+            startTime,
+            String.valueOf(duration.toMinutes()),
+            endTime
+        );
+        epicInfo += "\n";
+        writer.write(epicInfo);
       }
     } catch (IOException e) {
       System.out.println(String.format("Error when saving to a file: %s", e.getMessage()));
     }
-  }
-
-  public String getNestedElements(Epic elements) {
-    if (elements.isEmpty()) {
-      return "";
-    }
-    StringBuilder result = new StringBuilder();
-    for (Task element : elements) {
-      result.append(element).append(",");
-    }
-
-    result.deleteCharAt(result.length() - 1);
-    return result.toString();
   }
 
   public void loadFromFile(File file) {
@@ -60,19 +81,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
           isFirstLine = false;
           continue;
         }
-        String[] parts = line.split(",");
-        if (parts.length < 4) {
+        String[] elemFromCSV = line.split(",");
+        if (elemFromCSV.length < 4) {
           continue;
         }
-        String type = parts[0];
-        String title = parts[2];
-        String description = parts[3];
-        LocalDateTime startTime = LocalDateTime.parse(parts[5], formatter);
-        long durationMinutes = Long.parseLong(parts[6]);
+        String type = elemFromCSV[0];
+        String title = elemFromCSV[2];
+        String description = elemFromCSV[3];
+        LocalDateTime startTime = LocalDateTime.parse(elemFromCSV[5], formatter);
+        long durationMinutes = Long.parseLong(elemFromCSV[6]);
 
         if (type.equals("TASK") || type.equals("EPIC")) {
           Task task = new Task(title, description, startTime, durationMinutes);
-          changeTaskStatus(task, Task.TaskStatus.valueOf(parts[4]));
+          changeTaskStatus(task, Task.TaskStatus.valueOf(elemFromCSV[4]));
           addTask(task);
 
           Epic epic = new Epic(title, task);

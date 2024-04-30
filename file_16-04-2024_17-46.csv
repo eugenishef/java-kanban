@@ -1,4 +1,0 @@
-type,id,title,description,status,nestedElement
-TASK,e643f2ad-7fc8-4b05-9964-b55955f018e8,Delivery of goods,Call the courier on the day of delivery,NEW,
-SUBTASK,a19aee48-748f-4a25-9c48-9455bb53347a,Call technical support,Find out the courier's full name and number,NEW
-EPIC,a7de1a0d-fae1-4214-9320-44a11577496e,Difficulties of an introvert,,NEW,

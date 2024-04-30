@@ -4,7 +4,7 @@ import java.util.*;
 public class InMemoryTaskManager implements TaskManager {
     protected HashMap<String, Task> tasks;
     protected HashMap<String, Subtask> subtasks;
-    protected HashMap<String, ArrayList<Task>> epics;
+    protected HashMap<String, Epic> epics;
     private LinkedList<Task> history;
     private TreeSet<Task> prioritizedTasks;
 
@@ -46,7 +46,7 @@ public class InMemoryTaskManager implements TaskManager {
         return subtasks;
     }
 
-    public HashMap<String, ArrayList<Task>> getEpics() {
+    public HashMap<String, Epic> getEpics() {
         return epics;
     }
 
@@ -131,11 +131,13 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (!isOverlap) {
-            subtasks.put(subtaskId, subtasks.getOrDefault(subtaskId, subtask));
-            prioritizedTasks.add(subtask);
+            if (subtask.getStartTime() != null) {
+                prioritizedTasks.add(subtask);
+            }
         } else {
             System.out.println("Subtask time overlaps with an existing task.");
         }
+        subtasks.put(subtaskId, subtasks.getOrDefault(subtaskId, subtask));
     }
 
     @Override
@@ -204,16 +206,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addEpic(Epic epic, Task... tasks) {
-        String epicId = uuidGenerator.generateUuid();
-        ArrayList<Task> epicTasks = new ArrayList<>();
+    public void addEpic(Epic epic) {
+        String epicId = epic.getId();
 
-        for (Task task : tasks) {
-            epicTasks.add(task);
-        }
+        epic.setDuration(epic.calculateDuration());
+        epic.setStartTime(epic.calculateStartTime());
+        epic.setEndTime(epic.calculateEndTime());
 
         epics.put(epicId, epic);
-        epic.addTasks(epicTasks);
     }
 
     @Override
