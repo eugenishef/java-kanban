@@ -4,34 +4,51 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Epic extends ArrayList<Task> {
+    private static UUIDGenerator uuidGenerator = new UUIDGenerator();
     private String id;
     private String title;
-    private Task task;
     private ArrayList<Task> tasks;
-    private static UUIDGenerator uuidGenerator = new UUIDGenerator();
+    private Duration duration;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     protected HashMap<String, Epic> epics = new HashMap<>();
 
-    public Epic(String title, Task task) {
+    public Epic(String title, Task... tasks) {
         this.id = uuidGenerator.generateUuid();
         this.title = title;
-        this.task = task;
         this.tasks = new ArrayList<>();
+        for (Task task : tasks) {
+            this.tasks.add(task);
+        }
     }
 
     public String getId() {
         return this.id;
     }
 
-    public void addTasks(ArrayList<Task> task) {
-        this.tasks.addAll(task);
+    public void addTask(String epicId, Task task) {
+        Epic epic = epics.get(epicId);
+
+        if (epic != null) {
+            epic.addTask(epicId, task);
+        } else {
+            System.out.println("Epic with ID " + epicId + " not found.");
+        }
+
     }
 
     public String getTitle() {
         return this.title;
     }
 
-    public LocalDateTime getStartTime() {
+    public Duration calculateDuration() {
+        return this.stream()
+            .map(task -> task.getDuration())
+            .reduce(Duration.ZERO, Duration::plus);
+    }
+
+    public LocalDateTime calculateStartTime() {
         return this.stream()
             .filter(task -> task instanceof Subtask)
             .map(task -> ((Subtask) task).getStartTime())
@@ -39,19 +56,36 @@ public class Epic extends ArrayList<Task> {
             .orElse(null);
     }
 
-    public Duration getDuration() {
-        return this.stream()
-            .filter(task -> task instanceof Subtask)
-            .map(task -> ((Subtask) task).getDuration())
-            .reduce(Duration.ZERO, Duration::plus);
-    }
-
-    public LocalDateTime getEndTime() {
+    public LocalDateTime calculateEndTime() {
         return this.stream()
             .filter(task -> task instanceof Subtask)
             .map(task -> ((Subtask) task).getEndTime())
             .max(LocalDateTime::compareTo)
             .orElse(null);
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     @Override
@@ -60,9 +94,9 @@ public class Epic extends ArrayList<Task> {
         stringBuilder.append("Epic{")
             .append("id='").append(id).append('\'')
             .append(", title='").append(title).append('\'')
-            .append(", startTime=").append(getStartTime())
-            .append(", duration=").append(getDuration().toMinutes()).append(" minutes")
-            .append(", endTime=").append(getEndTime())
+            .append(", startTime=").append(calculateStartTime())
+            .append(", duration=").append(calculateDuration()).append(" minutes")
+            .append(", endTime=").append(calculateEndTime())
             .append(", tasks=").append(super.toString())
             .append('}');
         return stringBuilder.toString();

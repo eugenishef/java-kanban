@@ -21,7 +21,7 @@ public interface TaskManager {
     Subtask findSubtaskById(String taskId, String subtaskId);
     String getSubtaskIdFromTask(Task foundRecords);
     void removeSubtaskById(String subtaskId);
-    void addEpic(Epic epic, Task... tasks);
+    void addEpic(Epic epic);
     String getId(Epic epic);
     String getTitle(Epic epic);
     String getStatusFromTasks(Epic epic);
