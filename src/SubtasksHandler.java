@@ -5,16 +5,19 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TasksHandler implements HttpHandler {
+public class SubtasksHandler implements HttpHandler {
     private final TaskManager taskManager;
 
-    public TasksHandler(TaskManager taskManager) {
+    public SubtasksHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
@@ -41,15 +44,14 @@ public class TasksHandler implements HttpHandler {
     }
 
     private void handleGetRequest(HttpExchange exchange) throws IOException {
-        List<Task> allTasks = new ArrayList<>(taskManager.getTasks().values());
-        JsonArray tasksArray = new JsonArray();
+        List<Subtask> allSubtasks = new ArrayList<>(taskManager.getSubtasks().values());
+        JsonArray subtasksArray = new JsonArray();
 
-        for (Task task : allTasks) {
-            tasksArray.add(taskToJson(task));
+        for (Subtask subtask : allSubtasks) {
+            subtasksArray.add(subtaskToJson(subtask));
         }
-        sendResponse(exchange, tasksArray.toString(), 200);
+        sendResponse(exchange, subtasksArray.toString(), 200);
     }
-
     private void handlePostRequest(HttpExchange exchange) throws IOException {
         InputStreamReader stream = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(stream);
@@ -61,15 +63,15 @@ public class TasksHandler implements HttpHandler {
 
         JsonElement idElement = receivedJson.get("id");
         if (idElement != null && !idElement.isJsonNull()) {
-            String taskId = idElement.getAsString();
-            if (!taskId.isEmpty()) {
-                Task taskToUpdate = taskManager.findTaskById(taskId);
-                if (taskToUpdate != null) {
-                    updateTaskFromJson(taskToUpdate, receivedJson);
-                    jsonResponse = "{\"message\":\"Task updated\", \"id\":\"" + taskId + "\"}";
+            String subtaskId = idElement.getAsString();
+            if (!subtaskId.isEmpty()) {
+                Subtask subtaskToUpdate = taskManager.findSingleSubtask(subtaskId);
+                if (subtaskToUpdate != null) {
+                    updateSubtaskFromJson(subtaskToUpdate, receivedJson);
+                    jsonResponse = "{\"message\":\"Subtask updated\", \"id\":\"" + subtaskId + "\"}";
                     exchange.sendResponseHeaders(200, jsonResponse.getBytes().length);
                 } else {
-                    jsonResponse = "{\"error\":\"Task with this ID does not exist\"}";
+                    jsonResponse = "{\"error\":\"Subtask with this ID does not exist\"}";
                     exchange.sendResponseHeaders(404, jsonResponse.getBytes().length);
                 }
             } else {
@@ -77,14 +79,14 @@ public class TasksHandler implements HttpHandler {
                 exchange.sendResponseHeaders(400, jsonResponse.getBytes().length);
             }
         } else {
-            Task newTask = createTaskFromJson(receivedJson);
+            Subtask newSubtask = createSubtaskFromJson(receivedJson);
 
-            if (taskManager.getTasks().containsKey(newTask.getId())) {
-                jsonResponse = "{\"error\":\"A task with the generated ID already exists\"}";
+            if (taskManager.getSubtasks().containsKey(newSubtask.getId())) {
+                jsonResponse = "{\"error\":\"A Subtask with the generated ID already exists\"}";
                 exchange.sendResponseHeaders(406, jsonResponse.getBytes().length);
             } else {
-                taskManager.addTask(newTask);
-                jsonResponse = "{\"message\":\"Task created\", \"id\":\"" + newTask.getId() + "\"}";
+                taskManager.addSubtask(newSubtask);
+                jsonResponse = "{\"message\":\"Subtask created\", \"id\":\"" + newSubtask.getId() + "\"}";
                 exchange.sendResponseHeaders(201, jsonResponse.getBytes().length);
             }
         }
@@ -92,7 +94,6 @@ public class TasksHandler implements HttpHandler {
         os.write(jsonResponse.getBytes());
         os.close();
     }
-
     private void handleDeleteRequest(HttpExchange exchange) throws IOException {
         InputStreamReader stream = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(stream);
@@ -103,15 +104,15 @@ public class TasksHandler implements HttpHandler {
         OutputStream os = exchange.getResponseBody();
 
         if (receivedJson.has("id") && !receivedJson.get("id").isJsonNull()) {
-            String taskId = receivedJson.get("id").getAsString().trim();
+            String subtaskId = receivedJson.get("id").getAsString().trim();
 
-            if (!taskId.isEmpty()) {
-                if (taskManager.getTasks().containsKey(taskId)) {
-                    taskManager.removeTaskById(taskId);
-                    jsonResponse = "{\"message\":\"Task with ID " + taskId + " has been deleted\"}";
+            if (!subtaskId.isEmpty()) {
+                if (taskManager.getSubtasks().containsKey(subtaskId)) {
+                    taskManager.removeSubtaskById(subtaskId);
+                    jsonResponse = "{\"message\":\"Subtask with ID " + subtaskId + " has been deleted\"}";
                     exchange.sendResponseHeaders(200, jsonResponse.getBytes().length);
                 } else {
-                    jsonResponse = "{\"error\":\"No task found with ID " + taskId + "\"}";
+                    jsonResponse = "{\"error\":\"Subtask not found with ID " + subtaskId + "\"}";
                     exchange.sendResponseHeaders(404, jsonResponse.getBytes().length);
                 }
             } else {
@@ -119,12 +120,42 @@ public class TasksHandler implements HttpHandler {
                 exchange.sendResponseHeaders(406, jsonResponse.getBytes().length);
             }
         } else {
-            jsonResponse = "{\"error\":\"Task ID is required\"}";
+            jsonResponse = "{\"error\":\"subtask ID is required\"}";
             exchange.sendResponseHeaders(400, jsonResponse.getBytes().length);
         }
 
         os.write(jsonResponse.getBytes());
         os.close();
+    }
+
+    private Subtask createSubtaskFromJson(JsonObject jsonObject) {
+        try {
+            String title = jsonObject.get("title").getAsString();
+            String description = jsonObject.get("description").getAsString();
+            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
+            long duration = jsonObject.get("duration").getAsLong();
+            return new Subtask(title, description, startTime, duration);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void updateSubtaskFromJson(Subtask subtaskToUpdate, JsonObject jsonObject) {
+        try {
+            String title = jsonObject.get("title").getAsString();
+            String description = jsonObject.get("description").getAsString();
+            Task.TaskStatus status = Task.TaskStatus.valueOf(jsonObject.get("status").getAsString().toUpperCase());
+            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
+            long duration = jsonObject.get("duration").getAsLong();
+            subtaskToUpdate.setTitle(title);
+            subtaskToUpdate.setDescription(description);
+            subtaskToUpdate.setStatus(status);
+            subtaskToUpdate.setStartTime(startTime);
+            subtaskToUpdate.setDuration(duration);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void sendResponse(HttpExchange exchange, String response, int statusCode) throws IOException {
@@ -134,45 +165,15 @@ public class TasksHandler implements HttpHandler {
         os.close();
     }
 
-    private JsonObject taskToJson(Task task) {
-        JsonObject jsonTask = new JsonObject();
-        jsonTask.addProperty("id", task.getId());
-        jsonTask.addProperty("title", task.getTitle());
-        jsonTask.addProperty("description", task.getDescription());
-        jsonTask.addProperty("status", task.getStatus().toString());
-        jsonTask.addProperty("startTime", task.getStartTime().toString());
-        jsonTask.addProperty("duration", task.getDuration().toMinutes());
+    private JsonObject subtaskToJson(Subtask subtask) {
+        JsonObject jsonSubtask = new JsonObject();
+        jsonSubtask.addProperty("id", subtask.getId());
+        jsonSubtask.addProperty("title", subtask.getTitle());
+        jsonSubtask.addProperty("description", subtask.getDescription());
+        jsonSubtask.addProperty("status", subtask.getStatus().toString());
+        jsonSubtask.addProperty("startTime", subtask.getStartTime().toString());
+        jsonSubtask.addProperty("duration", subtask.getDuration().toMinutes());
 
-        return jsonTask;
-    }
-
-    private Task createTaskFromJson(JsonObject jsonObject) {
-        try {
-            String title = jsonObject.get("title").getAsString();
-            String description = jsonObject.get("description").getAsString();
-            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
-            long duration = jsonObject.get("duration").getAsLong();
-            return new Task(title, description, startTime, duration);
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void updateTaskFromJson(Task taskToUpdate, JsonObject jsonObject) {
-        try {
-            String title = jsonObject.get("title").getAsString();
-            String description = jsonObject.get("description").getAsString();
-            Task.TaskStatus status = Task.TaskStatus.valueOf(jsonObject.get("status").getAsString().toUpperCase());
-            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
-            long duration = jsonObject.get("duration").getAsLong();
-            taskToUpdate.setTitle(title);
-            taskToUpdate.setDescription(description);
-            taskToUpdate.setStatus(status);
-            taskToUpdate.setStartTime(startTime);
-            taskToUpdate.setDuration(duration);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        return jsonSubtask;
     }
 }

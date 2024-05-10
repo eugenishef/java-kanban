@@ -46,13 +46,22 @@ public class Task {
     public String getId() {
         return this.id;
     }
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return this.title;
     }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getDescription() {
         return this.description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public TaskStatus getStatus() {
@@ -118,7 +127,7 @@ public class Task {
             .append(", description='").append(description).append('\'')
             .append(", status=").append(status)
             .append(", startTime=").append(startTime)
-            .append(", duration=").append(duration.toMinutes()).append(" minutes");
+            .append(", duration=").append(duration.toMinutes());
 
         if (!localTasksWithSubtasks.isEmpty()) {
             stringBuilder.append(", subtasks=[");

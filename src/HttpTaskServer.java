@@ -1,18 +1,24 @@
 import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class HttpTaskServer {
-    private static final int PORT = 8080;
-
     public static void main(String[] args) throws IOException {
-        System.setProperty("jdk.permissions.allowIllegalAccess", "true");
-        HttpServer httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
+        final int PORT = 8080;
+        TaskManager taskManager = new InMemoryTaskManager();
+        HistoryManager historyManager = new InMemoryHistoryManager();
 
-        httpServer.createContext("/tasks", new TasksHandler());
+        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        httpServer.start();
-        System.out.println("HTTP server start on port: " + PORT);
+        server.createContext("/tasks", new TasksHandler(taskManager));
+        server.createContext("/tasks/", new SingleTaskHandler(taskManager));
+        server.createContext("/subtasks", new SubtasksHandler(taskManager));
+        server.createContext("/subtasks/", new SingleSubtaskHandler(taskManager));
+        server.createContext("/epics", new EpicsHandler(taskManager));
+        server.createContext("/epics/", new SingleEpicHandler(taskManager));
+        server.createContext("/history", new HistoryHandler(taskManager, historyManager));
+        server.createContext("/prioritized", new PrioritizedHandler(taskManager));
+        server.start();
+        System.out.println("Server started on port: " + PORT);
     }
 }

@@ -1,6 +1,7 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Epic extends ArrayList<Task> {
@@ -18,9 +19,7 @@ public class Epic extends ArrayList<Task> {
         this.id = uuidGenerator.generateUuid();
         this.title = title;
         this.tasks = new ArrayList<>();
-        for (Task task : tasks) {
-            this.tasks.add(task);
-        }
+        this.tasks.addAll(Arrays.asList(tasks));
     }
 
     public String getId() {
@@ -38,14 +37,19 @@ public class Epic extends ArrayList<Task> {
 
     }
 
+    public ArrayList<Task> getTasks() {
+        return tasks;
+    }
+
     public String getTitle() {
         return this.title;
     }
+    public void setTitle(String newTitle) {this.title = newTitle;}
 
     public Duration calculateDuration() {
         return this.stream()
-            .map(task -> task.getDuration())
-            .reduce(Duration.ZERO, Duration::plus);
+                .map(task -> Duration.between(task.getStartTime(), task.getEndTime()))
+                .reduce(Duration.ZERO, Duration::plus);
     }
 
     public LocalDateTime calculateStartTime() {
@@ -91,11 +95,11 @@ public class Epic extends ArrayList<Task> {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Epic{")
+        stringBuilder.append("{")
             .append("id='").append(id).append('\'')
             .append(", title='").append(title).append('\'')
             .append(", startTime=").append(calculateStartTime())
-            .append(", duration=").append(calculateDuration()).append(" minutes")
+            .append(", duration=").append(calculateDuration())
             .append(", endTime=").append(calculateEndTime())
             .append(", tasks=").append(super.toString())
             .append('}');
