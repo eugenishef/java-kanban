@@ -1,3 +1,4 @@
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -180,10 +181,23 @@ public class InMemoryTaskManager implements TaskManager {
                 foundRecords.add(subtask);
                 return subtask;
             } catch (Exception e) {
-                throw new RuntimeException("Error finding task bu Id: " + e.getMessage(), e);
+                throw new RuntimeException("Error finding task buy Id: " + e.getMessage(), e);
             }
         }
         return null;
+    }
+
+    @Override
+    public Subtask findSingleSubtask(String id) {
+        List<Subtask> foundRecords = new ArrayList<>();
+
+        try {
+            Subtask subtask = subtasks.get(id);
+            foundRecords.add(subtask);
+            return subtask;
+        } catch (Exception e) {
+            throw new RuntimeException("Can't find subtask with id: " + id + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -201,19 +215,42 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeSubtaskById(String subtaskId) {
+    public void removeSubtaskById(String id) {
+        Subtask removedSubtask = subtasks.remove(id);
 
+        if (removedSubtask != null) {
+            subtasks.remove(id);
+        }
+
+        if (history.contains(removedSubtask)) {
+            history.remove(removedSubtask);
+        }
     }
 
     @Override
     public void addEpic(Epic epic) {
         String epicId = epic.getId();
 
-        epic.setDuration(epic.calculateDuration());
+        long durationMinutes = epic.calculateDuration().toMinutes();
+
+        epic.setDuration(Duration.ofMinutes(durationMinutes));
         epic.setStartTime(epic.calculateStartTime());
         epic.setEndTime(epic.calculateEndTime());
 
         epics.put(epicId, epic);
+    }
+    @Override
+    public Epic findEpicById(String id) {
+        try {
+            Epic epic = epics.get(id);
+            if (epic != null) {
+                return epic;
+            } else {
+                throw new IllegalArgumentException("Epic with ID " + id + " not found.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding task by ID: " + e.getMessage(), e);
+        }
     }
 
     @Override

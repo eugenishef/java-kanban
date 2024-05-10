@@ -5,6 +5,7 @@ import java.util.TreeSet;
 public interface TaskManager {
     HashMap<String, Task> getTasks();
     HashMap<String, Subtask> getSubtasks();
+    HashMap<String, Epic> getEpics();
     void addTask(Task task);
     String getId(Task task);
     String getTitle(Task task);
@@ -19,9 +20,11 @@ public interface TaskManager {
     String getTitle(Subtask subtask);
     String getDescription(Subtask subtask);
     Subtask findSubtaskById(String taskId, String subtaskId);
+    Subtask findSingleSubtask(String id);
     String getSubtaskIdFromTask(Task foundRecords);
     void removeSubtaskById(String subtaskId);
     void addEpic(Epic epic);
+    Epic findEpicById(String id);
     String getId(Epic epic);
     String getTitle(Epic epic);
     String getStatusFromTasks(Epic epic);
