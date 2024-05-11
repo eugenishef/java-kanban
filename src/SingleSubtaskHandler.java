@@ -51,9 +51,9 @@ public class SingleSubtaskHandler implements HttpHandler {
         } else {
             String response = "This method is not allowed";
             exchange.sendResponseHeaders(405, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+            OutputStream outputStream = exchange.getResponseBody();
+            outputStream.write(response.getBytes());
+            outputStream.close();
         }
     }
 }

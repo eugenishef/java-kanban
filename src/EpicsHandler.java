@@ -5,6 +5,8 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import utils.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,7 +53,7 @@ public class EpicsHandler implements HttpHandler {
         for (Epic epic : allEpics) {
             tasksArray.add(epicToJson(epic));
         }
-        sendResponse(exchange, tasksArray.toString(), 200);
+        HttpHelper.sendResponse(exchange, tasksArray.toString(), 200);
     }
 
     private void handlePostRequest(HttpExchange exchange) throws IOException {
@@ -61,7 +63,7 @@ public class EpicsHandler implements HttpHandler {
         reader.close();
 
         String jsonResponse;
-        OutputStream os = exchange.getResponseBody();
+        OutputStream outputStream = exchange.getResponseBody();
 
         JsonElement idElement = receivedJson.get("id");
         if (idElement != null && !idElement.isJsonNull()) {
@@ -93,8 +95,8 @@ public class EpicsHandler implements HttpHandler {
             }
         }
 
-        os.write(jsonResponse.getBytes());
-        os.close();
+        outputStream.write(jsonResponse.getBytes());
+        outputStream.close();
     }
 
     private void handleDeleteRequest(HttpExchange exchange) throws IOException {
@@ -104,7 +106,7 @@ public class EpicsHandler implements HttpHandler {
         reader.close();
 
         String jsonResponse;
-        OutputStream os = exchange.getResponseBody();
+        OutputStream outputStream = exchange.getResponseBody();
 
         if (receivedJson.has("id") && !receivedJson.get("id").isJsonNull()) {
             String epicId = receivedJson.get("id").getAsString().trim();
@@ -127,15 +129,8 @@ public class EpicsHandler implements HttpHandler {
             exchange.sendResponseHeaders(400, jsonResponse.getBytes().length);
         }
 
-        os.write(jsonResponse.getBytes());
-        os.close();
-    }
-
-    private void sendResponse(HttpExchange exchange, String response, int statusCode) throws IOException {
-        exchange.sendResponseHeaders(statusCode, response.getBytes().length);
-        OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        outputStream.write(jsonResponse.getBytes());
+        outputStream.close();
     }
 
     private JsonObject epicToJson(Epic epic) {
@@ -166,7 +161,7 @@ public class EpicsHandler implements HttpHandler {
 
     private Epic createEpicFromJson(JsonObject jsonObject) {
         try {
-            String title = jsonObject.get("title").getAsString();
+            String title = JsonHelper.getTitle(jsonObject);
             JsonArray tasksJsonArray = jsonObject.getAsJsonArray("tasks");
             ArrayList<Task> tasks = new ArrayList<>();
 
@@ -179,17 +174,17 @@ public class EpicsHandler implements HttpHandler {
             Epic epic = new Epic(title, tasks.toArray(new Task[0]));
 
             if (jsonObject.has("startTime")) {
-                LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
+                LocalDateTime startTime = JsonHelper.getStartTime(jsonObject);
                 epic.setStartTime(startTime);
             }
 
             if (jsonObject.has("endTime")) {
-                LocalDateTime endTime = LocalDateTime.parse(jsonObject.get("endTime").getAsString());
+                LocalDateTime endTime = JsonHelper.getEndTime(jsonObject);
                 epic.setEndTime(endTime);
             }
 
             if (jsonObject.has("duration")) {
-                long minutes = jsonObject.get("duration").getAsLong();
+                long minutes = JsonHelper.getDuration(jsonObject);
                 epic.setDuration(Duration.ofMinutes(minutes));
             }
 
@@ -203,10 +198,10 @@ public class EpicsHandler implements HttpHandler {
 
     private Task createTaskFromJson(JsonObject jsonObject) {
         try {
-            String title = jsonObject.get("title").getAsString();
-            String description = jsonObject.get("description").getAsString();
-            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
-            long duration = jsonObject.get("duration").getAsLong();
+            String title = JsonHelper.getTitle(jsonObject);
+            String description = JsonHelper.getDescription(jsonObject);
+            LocalDateTime startTime = JsonHelper.getStartTime(jsonObject);
+            long duration = JsonHelper.getDuration(jsonObject);
             return new Task(title, description, startTime, duration);
         } catch (Exception e){
             e.printStackTrace();
@@ -217,27 +212,27 @@ public class EpicsHandler implements HttpHandler {
     private void updateEpicFromJson(Epic epic, JsonObject jsonObject) {
         try {
             if (jsonObject.has("title")) {
-                String title = jsonObject.get("title").getAsString();
+                String title = JsonHelper.getTitle(jsonObject);
                 epic.setTitle(title);
             }
 
             if (jsonObject.has("startTime")) {
-                LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
+                LocalDateTime startTime = JsonHelper.getStartTime(jsonObject);
                 epic.setStartTime(startTime);
             }
 
             if (jsonObject.has("duration")) {
-                long durationMinutes = jsonObject.get("duration").getAsLong();
+                long durationMinutes = JsonHelper.getDuration(jsonObject);
                 epic.setDuration(Duration.ofMinutes(durationMinutes));
             }
 
             if (jsonObject.has("endTime")) {
-                LocalDateTime endTime = LocalDateTime.parse(jsonObject.get("endTime").getAsString());
+                LocalDateTime endTime = JsonHelper.getEndTime(jsonObject);
                 epic.setEndTime(endTime);
             }
 
             if (jsonObject.has("tasks")) {
-                JsonArray tasksJsonArray = jsonObject.getAsJsonArray("tasks");
+                JsonArray tasksJsonArray = JsonHelper.getAsArray(jsonObject, "tasks");
                 epic.getTasks().clear();
                 for (JsonElement taskElement : tasksJsonArray) {
                     JsonObject taskJsonObject = taskElement.getAsJsonObject();

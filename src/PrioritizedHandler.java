@@ -43,9 +43,9 @@ public class PrioritizedHandler implements HttpHandler {
 
         String response = jsonArray.toString();
         exchange.sendResponseHeaders(200, response.getBytes().length);
-        OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        OutputStream outputStream = exchange.getResponseBody();
+        outputStream.write(response.getBytes());
+        outputStream.close();
     }
 
     private JsonObject taskToJson(Task task) {

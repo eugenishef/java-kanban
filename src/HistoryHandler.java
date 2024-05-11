@@ -3,6 +3,8 @@ import com.google.gson.JsonObject;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import utils.HttpHelper;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -44,14 +46,7 @@ public class HistoryHandler implements HttpHandler {
         }
 
         String response = jsonHistory.toString();
-        sendResponse(exchange, response, 200);
-    }
-
-    private void sendResponse(HttpExchange exchange, String response, int statusCode) throws IOException {
-        exchange.sendResponseHeaders(statusCode, response.getBytes().length);
-        OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        HttpHelper.sendResponse(exchange, response, 200);
     }
 
     private JsonObject taskToJson(Task task) {

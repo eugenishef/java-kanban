@@ -5,6 +5,9 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import utils.HttpHelper;
+import utils.JsonHelper;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -47,7 +50,7 @@ public class TasksHandler implements HttpHandler {
         for (Task task : allTasks) {
             tasksArray.add(taskToJson(task));
         }
-        sendResponse(exchange, tasksArray.toString(), 200);
+        HttpHelper.sendResponse(exchange, tasksArray.toString(), 200);
     }
 
     private void handlePostRequest(HttpExchange exchange) throws IOException {
@@ -57,7 +60,7 @@ public class TasksHandler implements HttpHandler {
         reader.close();
 
         String jsonResponse;
-        OutputStream os = exchange.getResponseBody();
+        OutputStream outputStream = exchange.getResponseBody();
 
         JsonElement idElement = receivedJson.get("id");
         if (idElement != null && !idElement.isJsonNull()) {
@@ -89,8 +92,8 @@ public class TasksHandler implements HttpHandler {
             }
         }
 
-        os.write(jsonResponse.getBytes());
-        os.close();
+        outputStream.write(jsonResponse.getBytes());
+        outputStream.close();
     }
 
     private void handleDeleteRequest(HttpExchange exchange) throws IOException {
@@ -100,7 +103,7 @@ public class TasksHandler implements HttpHandler {
         reader.close();
 
         String jsonResponse;
-        OutputStream os = exchange.getResponseBody();
+        OutputStream outputStream = exchange.getResponseBody();
 
         if (receivedJson.has("id") && !receivedJson.get("id").isJsonNull()) {
             String taskId = receivedJson.get("id").getAsString().trim();
@@ -123,15 +126,8 @@ public class TasksHandler implements HttpHandler {
             exchange.sendResponseHeaders(400, jsonResponse.getBytes().length);
         }
 
-        os.write(jsonResponse.getBytes());
-        os.close();
-    }
-
-    private void sendResponse(HttpExchange exchange, String response, int statusCode) throws IOException {
-        exchange.sendResponseHeaders(statusCode, response.getBytes().length);
-        OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        outputStream.write(jsonResponse.getBytes());
+        outputStream.close();
     }
 
     private JsonObject taskToJson(Task task) {
@@ -148,10 +144,10 @@ public class TasksHandler implements HttpHandler {
 
     private Task createTaskFromJson(JsonObject jsonObject) {
         try {
-            String title = jsonObject.get("title").getAsString();
-            String description = jsonObject.get("description").getAsString();
-            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
-            long duration = jsonObject.get("duration").getAsLong();
+            String title = JsonHelper.getTitle(jsonObject);
+            String description = JsonHelper.getDescription(jsonObject);
+            LocalDateTime startTime = JsonHelper.getStartTime(jsonObject);
+            long duration = JsonHelper.getDuration(jsonObject);
             return new Task(title, description, startTime, duration);
         } catch (Exception e){
             e.printStackTrace();
@@ -161,11 +157,12 @@ public class TasksHandler implements HttpHandler {
 
     private void updateTaskFromJson(Task taskToUpdate, JsonObject jsonObject) {
         try {
-            String title = jsonObject.get("title").getAsString();
-            String description = jsonObject.get("description").getAsString();
-            Task.TaskStatus status = Task.TaskStatus.valueOf(jsonObject.get("status").getAsString().toUpperCase());
-            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
-            long duration = jsonObject.get("duration").getAsLong();
+            String title = JsonHelper.getTitle(jsonObject);
+            String description = JsonHelper.getDescription(jsonObject);
+            Task.TaskStatus status = JsonHelper.getStatus(jsonObject);
+            LocalDateTime startTime = JsonHelper.getStartTime(jsonObject);
+            long duration = JsonHelper.getDuration(jsonObject);
+
             taskToUpdate.setTitle(title);
             taskToUpdate.setDescription(description);
             taskToUpdate.setStatus(status);
